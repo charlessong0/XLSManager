@@ -15,20 +15,24 @@ import DButil.DataBase;
 
 public class CreateExcelFromDB {
 	
-	public ResultSet readDB() throws SQLException {
-		String prepare = "select * from user";
+	public ResultSet readDB(String userid) throws SQLException {
+		String prepare1 = "select * from user";
+		String prepare = "(select * from ((select userid, groupid from usergrouprelation where groupid in " +
+				"(select groupid from usergrouprelation where userid = ?))a0 inner join " +
+				"(select userID, blogscore, gitscore, finalescore from score)b0 on a0.userID = b0.userid ) )";
 		ResultSet rs = null;
 		
 		
 		DataBase db = new DataBase();
 		PreparedStatement ps = db.getPreparedStatement(prepare);
+		ps.setString(1, userid);
 		
 		rs = ps.executeQuery();
 		
 		return rs;
 	}
 	
-	public void createExcel(ResultSet rs,String xlsName,String sheetName) {
+	public void createExcel(ResultSet rs,String xlsName,String sheetName) throws InterruptedException {
 		try {
 			HSSFWorkbook workbook = new HSSFWorkbook();
 			HSSFSheet sheet = workbook.createSheet();
@@ -37,7 +41,7 @@ public class CreateExcelFromDB {
 			HSSFCell cell;
 			ResultSetMetaData md=rs.getMetaData();
 			int nColumn=md.getColumnCount();
-			//Ğ´Èë¸÷¸ö×Ö¶ÎµÄÃû³Æ
+			//å†™å…¥å„ä¸ªå­—æ®µçš„åç§°
 			for(int i=1;i<=nColumn;i++) { 
 				cell = row.createCell((short)(i-1));
 				cell.setCellType(HSSFCell.CELL_TYPE_STRING);
@@ -45,7 +49,7 @@ public class CreateExcelFromDB {
 			}
 	
 			int iRow=1;
-			//Ğ´Èë¸÷Ìõ¼ÇÂ¼£¬Ã¿Ìõ¼ÇÂ¼¶ÔÓ¦ExcelÖĞµÄÒ»ĞĞ
+			//å†™å…¥å„æ¡è®°å½•ï¼Œæ¯æ¡è®°å½•å¯¹åº”Excelä¸­çš„ä¸€è¡Œ
 			while(rs.next())
 			{row= sheet.createRow((short)iRow);;
 			for(int j=1;j<=nColumn;j++)
@@ -65,41 +69,41 @@ public class CreateExcelFromDB {
 		catch (Exception e) {
 			
 		}
-		
-		System.out.println("µ¼³öÊı¾İ³É¹¦£¡");
+		//Thread.sleep(3000);
+		System.out.println("å¯¼å‡ºæ•°æ®æˆåŠŸï¼");
 	}
 	
 	public void testXLS() {
 		try {
-			String xlsFile="D:\\test.xls"; //²úÉúµÄExcelÎÄ¼şµÄÃû³Æ
+			String xlsFile="D:\\test.xls"; //äº§ç”Ÿçš„Excelæ–‡ä»¶çš„åç§°
 			
-			HSSFWorkbook workbook = new HSSFWorkbook(); //²úÉú¹¤×÷²¾¶ÔÏó
-			HSSFSheet sheet = workbook.createSheet(); //²úÉú¹¤×÷±í¶ÔÏó
-			//ÉèÖÃµÚÒ»¸ö¹¤×÷±íµÄÃû³ÆÎªfirstSheet
-			//ÎªÁË¹¤×÷±íÄÜÖ§³ÖÖĞÎÄ£¬ÉèÖÃ×Ö·û±àÂëÎªUTF_16
+			HSSFWorkbook workbook = new HSSFWorkbook(); //äº§ç”Ÿå·¥ä½œç°¿å¯¹è±¡
+			HSSFSheet sheet = workbook.createSheet(); //äº§ç”Ÿå·¥ä½œè¡¨å¯¹è±¡
+			//è®¾ç½®ç¬¬ä¸€ä¸ªå·¥ä½œè¡¨çš„åç§°ä¸ºfirstSheet
+			//ä¸ºäº†å·¥ä½œè¡¨èƒ½æ”¯æŒä¸­æ–‡ï¼Œè®¾ç½®å­—ç¬¦ç¼–ç ä¸ºUTF_16
 			workbook.setSheetName(0,"firstSheet");
-			//²úÉúÒ»ĞĞ
+			//äº§ç”Ÿä¸€è¡Œ
 			HSSFRow row = sheet.createRow((short)0);
-			//²úÉúµÚÒ»¸öµ¥Ôª¸ñ
+			//äº§ç”Ÿç¬¬ä¸€ä¸ªå•å…ƒæ ¼
 			HSSFCell cell = row.createCell((short) 0);
-			//ÉèÖÃµ¥Ôª¸ñÄÚÈİÎª×Ö·û´®ĞÍ
+			//è®¾ç½®å•å…ƒæ ¼å†…å®¹ä¸ºå­—ç¬¦ä¸²å‹
 			cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-			//ÎªÁËÄÜÔÚµ¥Ôª¸ñÖĞĞ´ÈëÖĞÎÄ£¬ÉèÖÃ×Ö·û±àÂëÎªUTF_16¡£
+			//ä¸ºäº†èƒ½åœ¨å•å…ƒæ ¼ä¸­å†™å…¥ä¸­æ–‡ï¼Œè®¾ç½®å­—ç¬¦ç¼–ç ä¸ºUTF_16ã€‚
 			//cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-			//ÍùµÚÒ»¸öµ¥Ôª¸ñÖĞĞ´ÈëĞÅÏ¢
-			cell.setCellValue("²âÊÔ³É¹¦2");
+			//å¾€ç¬¬ä¸€ä¸ªå•å…ƒæ ¼ä¸­å†™å…¥ä¿¡æ¯
+			cell.setCellValue("æµ‹è¯•æˆåŠŸ2");
 			FileOutputStream fOut = new FileOutputStream(xlsFile);
 			workbook.write(fOut);
 			fOut.flush();
 			fOut.close();
-			System.out.println("ÎÄ¼şÉú³É...");
-			//ÒÔÏÂÓï¾ä¶ÁÈ¡Éú³ÉµÄExcelÎÄ¼şÄÚÈİ
+			System.out.println("æ–‡ä»¶ç”Ÿæˆ...");
+			//ä»¥ä¸‹è¯­å¥è¯»å–ç”Ÿæˆçš„Excelæ–‡ä»¶å†…å®¹
 			FileInputStream fIn=new FileInputStream(xlsFile);
 			HSSFWorkbook readWorkBook= new HSSFWorkbook(fIn);
 			HSSFSheet readSheet= readWorkBook.getSheet("firstSheet");
 			HSSFRow readRow =readSheet.getRow(0);
 			HSSFCell readCell = readRow.getCell((short)0);
-			System.out.println("µÚÒ»¸öµ¥ÔªÊÇ£º" + readCell.getStringCellValue()); 
+			System.out.println("ç¬¬ä¸€ä¸ªå•å…ƒæ˜¯ï¼š" + readCell.getStringCellValue()); 
 			}
 			catch (Exception e) {
 				e.toString();
@@ -108,10 +112,10 @@ public class CreateExcelFromDB {
 	}
 	
 	
-	public static void main(String args[]) throws SQLException {
+	public static void main(String args[]) throws SQLException, InterruptedException {
 		CreateExcelFromDB createXLS = new CreateExcelFromDB();
 		
-		ResultSet rs = createXLS.readDB();
+		ResultSet rs = createXLS.readDB("12212010004");
 		createXLS.createExcel(rs, "D:\\test3.xls", "sheet1");
 		
 		//createXLS.testXLS();
