@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="D:/FD/学习资料/自学/数据库/poi-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="D:/FD/学习资料/自学/数据库/mysql-connector-java-5.0.4-bin.jar"/>
+	<classpathentry kind="lib" path="D:/workspace of Charles/workspace for java 1/XLSManager/src/lib/poi-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="D:/workspace of Charles/workspace for java 1/XLSManager/bin/lib/poi-3.6-20091214.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
